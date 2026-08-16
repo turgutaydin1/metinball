@@ -1,15 +1,18 @@
-METINBALL 3D - GITHUB PAGES
+METINBALL 3D - GITHUB PAGES / PC
 
-1) GitHub'da yeni repository oluştur: metinball
-2) Bu ZIP'in İÇİNDEKİ dosyaları repository köküne yükle.
-3) index.html kökte olacak.
-4) Settings > Pages
-5) Source: Deploy from a branch
-6) Branch: main
-7) Folder: /(root)
-8) Save
+Repository zaten GitHub Pages icin hazirdir.
 
-Adres yaklaşık şöyle olur:
-https://KULLANICIADIN.github.io/metinball/
+GitHub Pages:
+Settings > Pages > Deploy from a branch > main > /(root)
+Adres:
+https://turgutaydin1.github.io/metinball/
 
-NOT: Bu sürüm internet üzerinden Three.js ve gerçek rig'li 3D Soldier modelini yükler.
+PC:
+GitHub repository sayfasinda Code > Download ZIP.
+ZIP'i cikar.
+METINBALL_BASLAT.cmd dosyasina cift tikla.
+Oyun 127.0.0.1 uzerinden tarayicida acilir.
+
+Bu V3 surumunde generic Soldier/robot ve kirmizi kure hedef sistemi yoktur.
+Turgut, Zeko, Nafi, Baki ve orijinal Mini Metin yuzleri kullanilir.
+Three.js CDN'den yuklendigi icin internet gerekir.
