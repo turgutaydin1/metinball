@@ -1,28 +1,28 @@
-# MetinBall 3D — GitHub Pages sürümü
+# MetinBall 3D — Sadık Karakter Sürümü V3
 
-Bu paket, MetinBall'ın gerçek rig'li 3D karakter altyapısına geçirilmiş ilk tam oynanabilir GitHub Pages sürümüdür.
+Bu sürüm, MetinBall'ın mevcut kimliğini 3D'ye taşır. Generic Soldier/robot modeli ve kırmızı küre hedefler kaldırılmıştır.
 
-## İçerik
-- Gerçek skinned/rigged 3D humanoid karakter
-- 4 karakter seçimi: Turgut, Zeko, Nafi, Baki
-- 5 oynanabilir görev
-- Idle / Walk / Run animasyon geçişleri
-- Zıplama, koşma, ateş etme, şarjör değiştirme oyun mekanikleri
-- Kariyer / yıldız / en iyi skor kayıtları
+## Korunan MetinBall unsurları
+- Turgut, Zeko, Nafi ve Baki karakter seçimi
+- Karakterlerin kendi yüz referansları, kıyafet renkleri ve farklı oyun özellikleri
+- Orijinal dört Mini Metin görselinden oluşturulan 3D Mini Metin karakterleri
+- 5 görev: Metin Yağmuru, Silahlı Metin Baskını, Metin Kaçıyor, Ofisi Koru, Büyük Metin
+- Bonus / sahte / kalkan / sivil / altın / boss türleri
+- Kariyer, yıldız, skor ve localStorage kayıtları
+- Kendi karakterini yükleme
 - Ayarlar ve tam ekran
-- Tarayıcı localStorage kayıt sistemi
-- GitHub Pages uyumlu statik yapı
 
-## GitHub Pages'e yükleme
-1. GitHub'da yeni bir repository oluşturun. Önerilen ad: `metinball`.
-2. Bu klasördeki DOSYALARIN TAMAMINI repository'nin kök dizinine yükleyin. `index.html` doğrudan kökte kalmalı.
-3. GitHub'da: **Settings > Pages**.
-4. **Build and deployment > Source** bölümünde **Deploy from a branch** seçin.
-5. Branch: **main**, klasör: **/(root)** seçip **Save** deyin.
-6. Birkaç dakika sonra oyun şu biçimde açılır:
-   `https://KULLANICIADINIZ.github.io/metinball/`
+## 3D karakter hareketleri
+Karakterler tek parça PNG olarak döndürülmez. Hiyerarşik 3D eklem sistemiyle baş, gövde, omuz, dirsek, kalça ve dizler ayrı hareket eder. Idle, yürüme, koşma, zıplama, çömelme, yakalama, nişan/ateş, şarjör ve darbe pozları vardır.
 
-## Önemli
-Bu sürümde Three.js ve onaylanan rig'li Soldier.glb modeli internetten yüklenir. Bu nedenle GitHub Pages üzerinde çalışırken internet bağlantısı gerekir.
+## GitHub Pages
+`index.html` kök dizindedir. Pages kaynağı `main` ve `/(root)` olmalıdır.
 
-Dört oyun karakteri şu anda aynı kaliteli rig tabanını kullanır; oyun içi özellikleri ve renkleri farklıdır. Fotoğraftan kişiye özel gerçek 3D yüz/avatar üretimi bu sürümün parçası değildir.
+Oyun adresi:
+`https://turgutaydin1.github.io/metinball/`
+
+## Windows PC
+Repository'yi ZIP olarak indirip çıkardıktan sonra `METINBALL_BASLAT.cmd` dosyasına çift tıklayın. PowerShell tabanlı küçük yerel sunucu oyunu tarayıcıda açar; Node kurulumu gerekmez.
+
+## İnternet
+Three.js modülü jsDelivr CDN'den yüklendiği için bu V3 sürümünün açılışında internet bağlantısı gerekir. Karakter ve Mini Metin yüz görselleri repository içindeki JavaScript asset dosyalarına gömülüdür.
