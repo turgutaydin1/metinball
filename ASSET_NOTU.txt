@@ -1,3 +1,8 @@
-3D motor: Three.js (resmi CDN modülü)
-3D rig kalite tabanı: Three.js resmi örnek deposundaki Soldier.glb
-Model oyuna paket içinde gömülmemiştir; çalışma anında resmi GitHub raw adresinden yüklenir.
+METINBALL 3D - ASSET NOTU
+
+3D motor: Three.js.
+Generic Soldier/robot modeli kullanılmaz.
+Turgut, Zeko, Nafi ve Baki yüz referansları repository içindeki gömülü WebP asset modüllerinden yüklenir.
+Mini Metin 1-4 görselleri de repository içindeki gömülü asset modüllerinden yüklenir ve 3D Mini Metin karakterlerinde kullanılır.
+Karakter gövdeleri ve eklem animasyonları Three.js ile oyun kodunda oluşturulur.
+Bu V3 sürümünde yalnız Three.js modülü jsDelivr CDN'den yüklenir; internet gerekir.
