@@ -1,0 +1,15 @@
+METINBALL 3D - GITHUB PAGES
+
+1) GitHub'da yeni repository oluştur: metinball
+2) Bu ZIP'in İÇİNDEKİ dosyaları repository köküne yükle.
+3) index.html kökte olacak.
+4) Settings > Pages
+5) Source: Deploy from a branch
+6) Branch: main
+7) Folder: /(root)
+8) Save
+
+Adres yaklaşık şöyle olur:
+https://KULLANICIADIN.github.io/metinball/
+
+NOT: Bu sürüm internet üzerinden Three.js ve gerçek rig'li 3D Soldier modelini yükler.

@@ -1,0 +1,3 @@
+3D motor: Three.js (resmi CDN modülü)
+3D rig kalite tabanı: Three.js resmi örnek deposundaki Soldier.glb
+Model oyuna paket içinde gömülmemiştir; çalışma anında resmi GitHub raw adresinden yüklenir.
