@@ -5,6 +5,9 @@
 
   // GÖREV 2: hedef container'ı gerçek nesnedir (node). Ölçek burada tutulur
   // ve updateMission2 içinde her karede korunur; böylece ana oyun kodu ölçeği geri büyütemez.
+  // v0.20.7: önceki 0.060 oranı fazla küçüktü; orta seviye 0.084'e çıkarıldı.
+  const M2_TARGET_HEIGHT_RATIO = 0.084;
+
   const previousSpawnMission2Target = GameScene.prototype.spawnMission2Target;
   if (typeof previousSpawnMission2Target === 'function') {
     GameScene.prototype.spawnMission2Target = function(...args) {
@@ -14,12 +17,12 @@
       if (phone() && (this.m2Targets?.length || 0) > before) {
         const target = this.m2Targets[this.m2Targets.length - 1];
         if (target?.node?.active) {
-          const targetHeight = this.scale.height * 0.060;
+          const targetHeight = this.scale.height * M2_TARGET_HEIGHT_RATIO;
           const baseScale = targetHeight / 116;
           target.__mobileBaseScale = baseScale;
           target.node.setScale(baseScale);
 
-          // Atış alanı da görsel boyutla aynı oranda küçülür.
+          // Atış alanı da görsel boyutla aynı oranda büyür/küçülür.
           target.radiusX = (target.kind === 'shield' ? 68 : 58) * baseScale;
           target.radiusY = 80 * baseScale;
         }
@@ -42,7 +45,7 @@
       t.node.angle = Math.sin(t.wave * 1.2) * 4;
 
       const bob = 1 + Math.sin(t.wave * 1.4) * 0.015;
-      const baseScale = t.__mobileBaseScale || (this.scale.height * 0.060 / 116);
+      const baseScale = t.__mobileBaseScale || (this.scale.height * M2_TARGET_HEIGHT_RATIO / 116);
       t.__mobileBaseScale = baseScale;
       t.node.setScale(baseScale * bob);
 
