@@ -1,1 +1,0 @@
-Mini Metin 1-4 görselleri de repository içindeki gömülü asset modüllerinden yüklenir ve 3D Mini Metin karakterlerinde kullanılır.
