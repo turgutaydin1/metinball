@@ -11,33 +11,64 @@
     return out;
   };
 
+  GameScene.prototype.m3BuildBackground=function(){
+    const w=this.scale.width,h=this.scale.height;
+    this.m3Bg=[];
+    const add=o=>{o.setDepth(4);this.m3Bg.push(o);return o};
+    add(this.add.rectangle(w/2,h*.52,w,h*.58,0x173d31,1));
+    add(this.add.rectangle(w/2,h*.42,w,h*.22,0x315d4c,1));
+    add(this.add.rectangle(w/2,h*.58,w,h*.12,0x796044,1));
+    add(this.add.rectangle(w/2,h*.64,w,h*.06,0x4a3628,1));
+    add(this.add.rectangle(w/2,h*.69,w,h*.08,0x20392d,1));
+    for(let i=0;i<9;i++){
+      const x=w*(.04+i*.115);
+      add(this.add.rectangle(x,h*.34,Math.max(4,w*.005),h*.30,0x6c806c,.65));
+      add(this.add.rectangle(x+w*.026,h*.49,w*.052,Math.max(4,h*.006),0x8da18a,.55));
+    }
+    for(let i=0;i<14;i++){
+      const x=w*(i/13),y=h*(.66+Math.sin(i*.9)*.018);
+      add(this.add.circle(x,y,phone()?10:17,i%3===0?0x426f3e:i%3===1?0x315b32:0x527b43,.95));
+    }
+    add(this.add.text(w*.5,h*.285,'METİN BAHÇESİ',{fontFamily:'Arial Black, Arial',fontSize:phone()?`${Math.max(12,Math.round(w*.033))}px`:'18px',color:'#d7e7c2',stroke:'#173126',strokeThickness:4}).setOrigin(.5));
+  };
+
   const oldCreatePlayer=GameScene.prototype.createPlayer;
   GameScene.prototype.createPlayer=function(withWeapon=false){
     const out=oldCreatePlayer.call(this,withWeapon);
     if(this.selectedMission!==3) return out;
-    const h=this.scale.height;
+    const w=this.scale.width,h=this.scale.height,isPhone=phone();
     try{this.playerImage?.setVisible(true).clearTint();}catch{}
     try{this.weaponPivot?.setVisible(false)}catch{}
-    const ph=this.playerImage?.displayHeight||228;
-    if(phone()){
-      this.playerImage?.setDisplaySize(ph*.58,ph);
-      this.playerBaseY=h*.91;
-      if(this.player)this.player.y=this.playerBaseY;
-      this.playerShadow?.setY(this.playerBaseY+8);
-    }else{
-      this.playerBaseY=h-48;
-      if(this.player)this.player.y=this.playerBaseY;
-      this.playerShadow?.setY(this.playerBaseY+10);
-    }
-    this.playerLabel?.setText(this.selected.name);
 
-    const bat=this.add.container(ph*.18,-ph*.66);
+    const targetH=isPhone?Math.min(h*.245,w*.56):Math.min(h*.34,320);
+    if(this.playerImage){
+      this.playerImage.setDisplaySize(targetH*(160/276),targetH);
+      this.playerImage.setY(-targetH*.48);
+      this.playerImage.setFlipX(false);
+      this.playerImage.setAngle(0);
+    }
+    this.m3PlayerH=targetH;
+    this.playerBaseY=isPhone?h*.915:h-42;
+    if(this.player)this.player.y=this.playerBaseY;
+    this.playerShadow?.setY(this.playerBaseY+9);
+    this.playerLabel?.setText(this.selected.name).setY(isPhone?h*.012:4);
+
+    // Gerçek karakter gövdesi korunur, fakat yüz yerine arkadan bakış hissi veren başlık kullanılır.
+    const rear=this.add.container(0,-targetH*.79);
+    const rg=this.add.graphics();
+    const hair=this.selected.id==='baki'?0x292725:this.selected.id==='nafi'?0x34302c:this.selected.id==='zeko'?0x54463c:0x3b332d;
+    rg.fillStyle(0xc99670,1);rg.fillEllipse(0,targetH*.015,targetH*.19,targetH*.16);
+    rg.fillStyle(hair,1);rg.fillEllipse(0,-targetH*.018,targetH*.20,targetH*.105);
+    rg.fillStyle(0x7f5a42,.35);rg.fillEllipse(0,targetH*.052,targetH*.13,targetH*.055);
+    rear.add(rg);rear.setDepth(25);this.player.add(rear);this.player.bringToTop(rear);this.m3RearHead=rear;
+
+    const bat=this.add.container(targetH*.20,-targetH*.73);
     const g=this.add.graphics();
-    g.fillStyle(0x6e4022,1);g.fillRoundedRect(-ph*.026,-ph*.42,ph*.052,ph*.46,ph*.026);
-    g.fillStyle(0xb7773a,1);g.fillRoundedRect(-ph*.040,-ph*.45,ph*.080,ph*.14,ph*.035);
-    g.lineStyle(Math.max(1,ph*.007),0x321d10,.88);g.strokeRoundedRect(-ph*.026,-ph*.42,ph*.052,ph*.46,ph*.026);
-    bat.add(g);bat.setRotation(.25);this.player.add(bat);this.player.bringToTop(bat);
-    this.m3Bat=bat;this.m3BatRest=.25;this.m3LastSwing=0;
+    g.fillStyle(0x6e4022,1);g.fillRoundedRect(-targetH*.026,-targetH*.42,targetH*.052,targetH*.46,targetH*.026);
+    g.fillStyle(0xb7773a,1);g.fillRoundedRect(-targetH*.040,-targetH*.45,targetH*.080,targetH*.14,targetH*.035);
+    g.lineStyle(Math.max(1,targetH*.007),0x321d10,.88);g.strokeRoundedRect(-targetH*.026,-targetH*.42,targetH*.052,targetH*.46,targetH*.026);
+    bat.add(g);bat.setRotation(.28);this.player.add(bat);this.player.bringToTop(bat);
+    this.m3Bat=bat;this.m3BatRest=.28;this.m3LastSwing=0;
     return out;
   };
 
@@ -58,15 +89,16 @@
 
   GameScene.prototype.m3BuildHoles=function(){
     this.m3Holes=[];this.m3Whacks=[];
+    this.m3BuildBackground();
     const w=this.scale.width,h=this.scale.height;
-    const xs=phone()?[w*.19,w*.50,w*.81]:[w*.34,w*.50,w*.66];
-    const y=phone()?h*.48:h*.47;
-    const holeW=phone()?w*.235:165,holeH=phone()?h*.036:29;
+    const xs=phone()?[w*.19,w*.50,w*.81]:[w*.37,w*.50,w*.63];
+    const y=phone()?h*.48:h*.48;
+    const holeW=phone()?w*.235:175,holeH=phone()?h*.036:31;
     for(const x of xs){
       const shadow=this.add.ellipse(x,y+holeH*.30,holeW*.96,holeH*1.46,0x000000,.30).setDepth(6);
       const rimBack=this.add.ellipse(x,y,holeW,holeH*1.72,0x744d2f,1).setDepth(7);
       const dark=this.add.ellipse(x,y+holeH*.07,holeW*.82,holeH,0x150c08,1).setDepth(8);
-      const rimFront=this.add.arc(x,y+holeH*.20,holeW*.50,holeH*.48,0,180,false,0x8a5a34,1).setScale(1,1).setDepth(12);
+      const rimFront=this.add.arc(x,y+holeH*.20,holeW*.50,holeH*.48,0,180,false,0x8a5a34,1).setDepth(12);
       this.m3Holes.push({x,y,rimBack,rimFront,dark,shadow,busy:false,holeW,holeH});
     }
   };
@@ -83,17 +115,14 @@
     const hole=Phaser.Utils.Array.GetRandom(free);hole.busy=true;
     const w=this.scale.width,h=this.scale.height,roll=Math.random();
     const kind=roll<.11?'gold':roll<.25?'fast':'normal',frame=kind==='gold'?1:Phaser.Math.Between(0,3);
-    const mh=phone()?h*.115:124;
-
+    const mh=phone()?h*.115:126;
     const sprite=this.add.image(hole.x,hole.y+mh*.40,'miniSheet',frame).setDisplaySize(mh*.67,mh).setDepth(10);
     if(kind==='gold')sprite.setTint(0xffe08a);
     const maskG=this.make.graphics({x:0,y:0,add:false});
     maskG.fillStyle(0xffffff,1);maskG.fillRect(hole.x-hole.holeW*.54,0,hole.holeW*1.08,hole.y+hole.holeH*.18);
     const mask=maskG.createGeometryMask();sprite.setMask(mask);
-
     const badge=this.add.text(hole.x,hole.y-mh*.40,kind==='gold'?'ALTIN':kind==='fast'?'HIZLI':'METİN',{fontFamily:'Arial Black, Arial',fontSize:phone()?`${Math.max(8,Math.round(w*.020))}px`:'10px',color:'#fff',backgroundColor:kind==='gold'?'#9b7416':kind==='fast'?'#9b4930':'#7e3038',padding:{x:4,y:2}}).setOrigin(.5).setDepth(13).setAlpha(0);
     const t={hole,sprite,badge,maskG,mask,kind,resolved:false,exposed:false,expireAt:0,marked:false};this.m3Whacks.push(t);
-
     const riseY=hole.y+mh*.16,rise=kind==='fast'?130:180;
     this.tweens.add({targets:sprite,y:riseY,duration:rise,ease:'Quad.easeOut',onComplete:()=>{
       if(t.resolved)return;t.exposed=true;badge.setAlpha(1).setPosition(hole.x,hole.y-mh*.38);
@@ -111,18 +140,28 @@
     }
   };
 
+  GameScene.prototype.m3FaceTarget=function(x){
+    if(!this.playerImage||!this.player)return;
+    const dir=x<this.player.x?-1:1;
+    this.playerImage.setFlipX(dir<0);
+    if(this.m3RearHead)this.m3RearHead.x=dir<0?2:-2;
+    if(this.m3Bat)this.m3Bat.x=Math.abs(this.m3Bat.x)*dir;
+  };
+
   GameScene.prototype.m3SwingBat=function(target,hit){
     const now=this.time.now;if(now-(this.m3LastSwing||0)<150)return false;this.m3LastSwing=now;
     const x=target?.hole?.x??target?.worldX??this.player.x;
+    this.m3FaceTarget(x);
     const arrive=()=>{
       if(!this.m3Bat)return;
-      this.tweens.killTweensOf(this.m3Bat);this.m3Bat.setRotation(this.m3BatRest??.25);
-      this.tweens.add({targets:this.m3Bat,rotation:-1.82,duration:120,hold:35,yoyo:true,ease:'Quad.easeIn',onYoyo:()=>{
+      const dir=x<this.player.x?-1:1;
+      this.tweens.killTweensOf(this.m3Bat);this.m3Bat.setRotation(this.m3BatRest*dir);
+      this.tweens.add({targets:this.m3Bat,rotation:-1.82*dir,duration:120,hold:35,yoyo:true,ease:'Quad.easeIn',onYoyo:()=>{
         if(hit&&target&&!target.resolved)this.m3HitTarget(target,true);
       }});
     };
     if(this.player){
-      const dist=Math.abs(this.player.x-x),dur=Math.min(170,60+dist*.10);
+      const dist=Math.abs(this.player.x-x),dur=Math.min(180,60+dist*.10);
       this.tweens.killTweensOf(this.player);this.tweens.add({targets:this.player,x,duration:dur,ease:'Quad.easeOut',onComplete:arrive});
       if(this.playerShadow){this.tweens.killTweensOf(this.playerShadow);this.tweens.add({targets:this.playerShadow,x,duration:dur,ease:'Quad.easeOut'});}
     }else arrive();
@@ -206,7 +245,9 @@
   GameScene.prototype.cleanupMissionObjects=function(...args){
     if(this.m3Whacks){for(const t of this.m3Whacks)this.m3DestroyTarget?.(t);this.m3Whacks=[];}
     if(this.m3Holes){for(const h of this.m3Holes){for(const k of ['rimBack','rimFront','dark','shadow'])try{h[k]?.destroy()}catch{}}this.m3Holes=[];}
+    if(this.m3Bg){for(const o of this.m3Bg)try{o?.destroy()}catch{}this.m3Bg=[];}
     try{this.m3Bat?.destroy()}catch{}this.m3Bat=null;
+    try{this.m3RearHead?.destroy()}catch{}this.m3RearHead=null;
     return oldCleanup?.apply(this,args);
   };
 })();
