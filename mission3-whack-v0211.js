@@ -33,7 +33,12 @@
     add(this.add.text(w*.5,h*.285,'METİN BAHÇESİ',{fontFamily:'Arial Black, Arial',fontSize:phone()?`${Math.max(12,Math.round(w*.033))}px`:'18px',color:'#d7e7c2',stroke:'#173126',strokeThickness:4}).setOrigin(.5));
   };
 
-  const hairColor=id=>id==='baki'?0x282522:id==='nafi'?0x38312d:id==='zeko'?0x58483d:0x3b332d;
+  const styleFor=id=>{
+    if(id==='zeko')return{shirt:0xf1eee7,pants:0xb59a70,hair:0x51443b,skin:0xc99570,shoe:0x3b3027};
+    if(id==='nafi')return{shirt:0x4f5d68,pants:0x273139,hair:0x302b28,skin:0xb98260,shoe:0x171a1d};
+    if(id==='baki')return{shirt:0x17191c,pants:0x111317,hair:0x2a2725,skin:0xb98260,shoe:0x090a0b};
+    return{shirt:0xe9ecef,pants:0x25292e,hair:0x606064,skin:0xc99570,shoe:0x17191c};
+  };
 
   const oldCreatePlayer=GameScene.prototype.createPlayer;
   GameScene.prototype.createPlayer=function(withWeapon=false){
@@ -42,46 +47,66 @@
 
     const w=this.scale.width,h=this.scale.height,isPhone=phone();
     try{this.weaponPivot?.setVisible(false)}catch{}
+    try{this.playerImage?.setVisible(false)}catch{}
 
-    const targetH=isPhone?Math.min(h*.285,w*.66):Math.min(h*.38,360);
-    this.m3PlayerH=targetH;
-    this.playerBaseY=isPhone?h*.925:h-34;
+    const H=isPhone?Math.min(h*.30,w*.70):Math.min(h*.40,365);
+    const s=styleFor(this.selected.id);
+    this.m3PlayerH=H;
+    this.playerBaseY=isPhone?h*.925:h-32;
     if(this.player)this.player.y=this.playerBaseY;
     this.playerShadow?.setY(this.playerBaseY+10);
     this.playerLabel?.setText(this.selected.name).setY(isPhone?h*.014:8);
 
-    // Ön yüzdeki yüz tamamen kaldırılır: yalnız karakterin gerçek gövde/kıyafet kısmı kullanılır.
-    if(this.playerImage){
-      try{this.playerImage.clearCrop()}catch{}
-      try{this.playerImage.setCrop(0,62,160,214)}catch{}
-      this.playerImage.setDisplaySize(targetH*(160/276),targetH*(214/276));
-      this.playerImage.setY(-targetH*.39);
-      this.playerImage.setFlipX(false);
-      this.playerImage.setAngle(0);
-      this.playerImage.setVisible(true);
-      try{this.playerImage.clearTint()}catch{}
-    }
-
-    // Ayrı, doğal arkadan baş görünümü. Yüzün üzerine bindirilmez; ön yüz crop ile zaten kaldırılmıştır.
-    const head=this.add.container(0,-targetH*.745).setDepth(24);
-    const hg=this.add.graphics();
-    const skin=0xc99570,hair=hairColor(this.selected.id);
-    hg.fillStyle(skin,1);hg.fillEllipse(0,0,targetH*.165,targetH*.145);
-    hg.fillStyle(hair,1);hg.fillEllipse(0,-targetH*.025,targetH*.172,targetH*.095);
-    hg.fillStyle(hair,.96);hg.fillRoundedRect(-targetH*.078,-targetH*.015,targetH*.156,targetH*.055,targetH*.02);
-    hg.fillStyle(skin,1);hg.fillEllipse(-targetH*.082,targetH*.005,targetH*.025,targetH*.045);hg.fillEllipse(targetH*.082,targetH*.005,targetH*.025,targetH*.045);
-    head.add(hg);
-    this.player.add(head);
-    this.player.bringToTop(head);
-    this.m3RearHead=head;
-
-    const bat=this.add.container(targetH*.19,-targetH*.67);
+    // Tek parça, arkadan görünen Görev 3 karakteri. Ön yüz sprite'ı hiç kullanılmaz.
+    const figure=this.add.container(0,-H*.48).setDepth(23);
     const g=this.add.graphics();
-    g.fillStyle(0x6e4022,1);g.fillRoundedRect(-targetH*.025,-targetH*.40,targetH*.050,targetH*.44,targetH*.025);
-    g.fillStyle(0xb7773a,1);g.fillRoundedRect(-targetH*.039,-targetH*.43,targetH*.078,targetH*.13,targetH*.034);
-    g.lineStyle(Math.max(1,targetH*.006),0x321d10,.88);g.strokeRoundedRect(-targetH*.025,-targetH*.40,targetH*.050,targetH*.44,targetH*.025);
-    bat.add(g);bat.setRotation(.30);this.player.add(bat);this.player.bringToTop(bat);
-    this.m3Bat=bat;this.m3BatRest=.30;this.m3LastSwing=0;
+    const sw=Math.max(2,H*.010);
+
+    // bacaklar / ayakkabılar
+    g.fillStyle(s.pants,1);
+    g.fillRoundedRect(-H*.120,H*.105,H*.095,H*.330,H*.035);
+    g.fillRoundedRect(H*.025,H*.105,H*.095,H*.330,H*.035);
+    g.fillStyle(s.shoe,1);
+    g.fillRoundedRect(-H*.145,H*.392,H*.130,H*.070,H*.025);
+    g.fillRoundedRect(H*.015,H*.392,H*.130,H*.070,H*.025);
+
+    // gövde ve omuzlar
+    g.fillStyle(s.shirt,1);
+    g.fillRoundedRect(-H*.175,-H*.190,H*.350,H*.335,H*.060);
+    g.fillEllipse(0,-H*.175,H*.390,H*.135);
+    g.lineStyle(sw,0x000000,.12);g.strokeRoundedRect(-H*.175,-H*.190,H*.350,H*.335,H*.060);
+
+    // kollar arkadan, sopa tutan sağ kol biraz yukarı
+    g.fillStyle(s.shirt,1);
+    g.fillRoundedRect(-H*.245,-H*.150,H*.095,H*.300,H*.045);
+    g.fillRoundedRect(H*.150,-H*.190,H*.095,H*.315,H*.045);
+    g.fillStyle(s.skin,1);
+    g.fillCircle(-H*.198,H*.135,H*.042);
+    g.fillCircle(H*.198,H*.100,H*.042);
+
+    // boyun ve baş: yalnız arka görünüm, yüz detayı yok
+    g.fillStyle(s.skin,1);g.fillRoundedRect(-H*.050,-H*.285,H*.100,H*.085,H*.025);
+    g.fillEllipse(0,-H*.365,H*.205,H*.205);
+    g.fillStyle(s.hair,1);
+    g.fillEllipse(0,-H*.405,H*.215,H*.135);
+    g.fillRoundedRect(-H*.095,-H*.410,H*.190,H*.095,H*.035);
+    // kulaklar arkadan çok hafif görünür
+    g.fillStyle(s.skin,1);g.fillEllipse(-H*.103,-H*.360,H*.030,H*.055);g.fillEllipse(H*.103,-H*.360,H*.030,H*.055);
+
+    figure.add(g);
+    this.player.add(figure);
+    this.player.bringToTop(figure);
+    this.m3RearFigure=figure;
+
+    // Sopa omuz hizasında; karakterden kopuk durmaz.
+    const bat=this.add.container(H*.185,-H*.690).setDepth(24);
+    const bg=this.add.graphics();
+    bg.fillStyle(0x6e4022,1);bg.fillRoundedRect(-H*.026,-H*.390,H*.052,H*.430,H*.026);
+    bg.fillStyle(0xb7773a,1);bg.fillRoundedRect(-H*.040,-H*.425,H*.080,H*.135,H*.035);
+    bg.lineStyle(Math.max(1,H*.006),0x321d10,.88);bg.strokeRoundedRect(-H*.026,-H*.390,H*.052,H*.430,H*.026);
+    bat.add(bg);bat.setRotation(.34);
+    this.player.add(bat);this.player.bringToTop(bat);
+    this.m3Bat=bat;this.m3BatRest=.34;this.m3LastSwing=0;
     return out;
   };
 
@@ -156,10 +181,9 @@
   GameScene.prototype.m3FaceTarget=function(x){
     if(!this.player)return;
     const dir=x<this.player.x?-1:1;
-    if(this.playerImage)this.playerImage.setFlipX(dir<0);
-    if(this.m3RearHead){this.m3RearHead.x=dir<0?targetSafe(-4):targetSafe(4);this.m3RearHead.setScale(dir<0?-1:1,1);}
+    // Arkadan görünüm korunur; yalnız gövde hedefe doğru hafifçe yatırılır.
+    if(this.m3RearFigure){this.m3RearFigure.setScale(dir<0?-1:1,1);this.m3RearFigure.setAngle(dir<0?-3:3);}
     if(this.m3Bat)this.m3Bat.x=Math.abs(this.m3Bat.x)*dir;
-    function targetSafe(v){return v}
   };
 
   GameScene.prototype.m3SwingBat=function(target,hit){
@@ -170,7 +194,7 @@
       if(!this.m3Bat)return;
       const dir=x<this.player.x?-1:1;
       this.tweens.killTweensOf(this.m3Bat);this.m3Bat.setRotation(this.m3BatRest*dir);
-      this.tweens.add({targets:this.m3Bat,rotation:-1.82*dir,duration:120,hold:35,yoyo:true,ease:'Quad.easeIn',onYoyo:()=>{
+      this.tweens.add({targets:this.m3Bat,rotation:-1.86*dir,duration:120,hold:35,yoyo:true,ease:'Quad.easeIn',onYoyo:()=>{
         if(hit&&target&&!target.resolved)this.m3HitTarget(target,true);
       }});
     };
@@ -261,8 +285,7 @@
     if(this.m3Holes){for(const h of this.m3Holes){for(const k of ['rimBack','rimFront','dark','shadow'])try{h[k]?.destroy()}catch{}}this.m3Holes=[];}
     if(this.m3Bg){for(const o of this.m3Bg)try{o?.destroy()}catch{}this.m3Bg=[];}
     try{this.m3Bat?.destroy()}catch{}this.m3Bat=null;
-    try{this.m3RearHead?.destroy()}catch{}this.m3RearHead=null;
-    try{this.playerImage?.clearCrop()}catch{}
+    try{this.m3RearFigure?.destroy()}catch{}this.m3RearFigure=null;
     return oldCleanup?.apply(this,args);
   };
 })();
