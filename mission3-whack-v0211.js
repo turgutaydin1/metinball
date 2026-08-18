@@ -1,5 +1,6 @@
 (()=>{
   if(typeof GameScene==='undefined') return;
+
   const phone=()=>((('ontouchstart' in window)||navigator.maxTouchPoints>0)&&Math.min(window.innerWidth,window.innerHeight)<900);
   const M3={id:3,title:'METİN’İ DELİĞİNE GERİ SOK',verb:'VUR',subtitle:'Delikten çıkan Metin’in kafasına sopayla vur ve geri sok.',duration:70};
 
@@ -32,43 +33,55 @@
     add(this.add.text(w*.5,h*.285,'METİN BAHÇESİ',{fontFamily:'Arial Black, Arial',fontSize:phone()?`${Math.max(12,Math.round(w*.033))}px`:'18px',color:'#d7e7c2',stroke:'#173126',strokeThickness:4}).setOrigin(.5));
   };
 
+  const hairColor=id=>id==='baki'?0x282522:id==='nafi'?0x38312d:id==='zeko'?0x58483d:0x3b332d;
+
   const oldCreatePlayer=GameScene.prototype.createPlayer;
   GameScene.prototype.createPlayer=function(withWeapon=false){
     const out=oldCreatePlayer.call(this,withWeapon);
     if(this.selectedMission!==3) return out;
+
     const w=this.scale.width,h=this.scale.height,isPhone=phone();
-    try{this.playerImage?.setVisible(true).clearTint();}catch{}
     try{this.weaponPivot?.setVisible(false)}catch{}
 
-    const targetH=isPhone?Math.min(h*.245,w*.56):Math.min(h*.34,320);
+    const targetH=isPhone?Math.min(h*.285,w*.66):Math.min(h*.38,360);
+    this.m3PlayerH=targetH;
+    this.playerBaseY=isPhone?h*.925:h-34;
+    if(this.player)this.player.y=this.playerBaseY;
+    this.playerShadow?.setY(this.playerBaseY+10);
+    this.playerLabel?.setText(this.selected.name).setY(isPhone?h*.014:8);
+
+    // Ön yüzdeki yüz tamamen kaldırılır: yalnız karakterin gerçek gövde/kıyafet kısmı kullanılır.
     if(this.playerImage){
-      this.playerImage.setDisplaySize(targetH*(160/276),targetH);
-      this.playerImage.setY(-targetH*.48);
+      try{this.playerImage.clearCrop()}catch{}
+      try{this.playerImage.setCrop(0,62,160,214)}catch{}
+      this.playerImage.setDisplaySize(targetH*(160/276),targetH*(214/276));
+      this.playerImage.setY(-targetH*.39);
       this.playerImage.setFlipX(false);
       this.playerImage.setAngle(0);
+      this.playerImage.setVisible(true);
+      try{this.playerImage.clearTint()}catch{}
     }
-    this.m3PlayerH=targetH;
-    this.playerBaseY=isPhone?h*.915:h-42;
-    if(this.player)this.player.y=this.playerBaseY;
-    this.playerShadow?.setY(this.playerBaseY+9);
-    this.playerLabel?.setText(this.selected.name).setY(isPhone?h*.012:4);
 
-    // Gerçek karakter gövdesi korunur, fakat yüz yerine arkadan bakış hissi veren başlık kullanılır.
-    const rear=this.add.container(0,-targetH*.79);
-    const rg=this.add.graphics();
-    const hair=this.selected.id==='baki'?0x292725:this.selected.id==='nafi'?0x34302c:this.selected.id==='zeko'?0x54463c:0x3b332d;
-    rg.fillStyle(0xc99670,1);rg.fillEllipse(0,targetH*.015,targetH*.19,targetH*.16);
-    rg.fillStyle(hair,1);rg.fillEllipse(0,-targetH*.018,targetH*.20,targetH*.105);
-    rg.fillStyle(0x7f5a42,.35);rg.fillEllipse(0,targetH*.052,targetH*.13,targetH*.055);
-    rear.add(rg);rear.setDepth(25);this.player.add(rear);this.player.bringToTop(rear);this.m3RearHead=rear;
+    // Ayrı, doğal arkadan baş görünümü. Yüzün üzerine bindirilmez; ön yüz crop ile zaten kaldırılmıştır.
+    const head=this.add.container(0,-targetH*.745).setDepth(24);
+    const hg=this.add.graphics();
+    const skin=0xc99570,hair=hairColor(this.selected.id);
+    hg.fillStyle(skin,1);hg.fillEllipse(0,0,targetH*.165,targetH*.145);
+    hg.fillStyle(hair,1);hg.fillEllipse(0,-targetH*.025,targetH*.172,targetH*.095);
+    hg.fillStyle(hair,.96);hg.fillRoundedRect(-targetH*.078,-targetH*.015,targetH*.156,targetH*.055,targetH*.02);
+    hg.fillStyle(skin,1);hg.fillEllipse(-targetH*.082,targetH*.005,targetH*.025,targetH*.045);hg.fillEllipse(targetH*.082,targetH*.005,targetH*.025,targetH*.045);
+    head.add(hg);
+    this.player.add(head);
+    this.player.bringToTop(head);
+    this.m3RearHead=head;
 
-    const bat=this.add.container(targetH*.20,-targetH*.73);
+    const bat=this.add.container(targetH*.19,-targetH*.67);
     const g=this.add.graphics();
-    g.fillStyle(0x6e4022,1);g.fillRoundedRect(-targetH*.026,-targetH*.42,targetH*.052,targetH*.46,targetH*.026);
-    g.fillStyle(0xb7773a,1);g.fillRoundedRect(-targetH*.040,-targetH*.45,targetH*.080,targetH*.14,targetH*.035);
-    g.lineStyle(Math.max(1,targetH*.007),0x321d10,.88);g.strokeRoundedRect(-targetH*.026,-targetH*.42,targetH*.052,targetH*.46,targetH*.026);
-    bat.add(g);bat.setRotation(.28);this.player.add(bat);this.player.bringToTop(bat);
-    this.m3Bat=bat;this.m3BatRest=.28;this.m3LastSwing=0;
+    g.fillStyle(0x6e4022,1);g.fillRoundedRect(-targetH*.025,-targetH*.40,targetH*.050,targetH*.44,targetH*.025);
+    g.fillStyle(0xb7773a,1);g.fillRoundedRect(-targetH*.039,-targetH*.43,targetH*.078,targetH*.13,targetH*.034);
+    g.lineStyle(Math.max(1,targetH*.006),0x321d10,.88);g.strokeRoundedRect(-targetH*.025,-targetH*.40,targetH*.050,targetH*.44,targetH*.025);
+    bat.add(g);bat.setRotation(.30);this.player.add(bat);this.player.bringToTop(bat);
+    this.m3Bat=bat;this.m3BatRest=.30;this.m3LastSwing=0;
     return out;
   };
 
@@ -92,7 +105,7 @@
     this.m3BuildBackground();
     const w=this.scale.width,h=this.scale.height;
     const xs=phone()?[w*.19,w*.50,w*.81]:[w*.37,w*.50,w*.63];
-    const y=phone()?h*.48:h*.48;
+    const y=h*.48;
     const holeW=phone()?w*.235:175,holeH=phone()?h*.036:31;
     for(const x of xs){
       const shadow=this.add.ellipse(x,y+holeH*.30,holeW*.96,holeH*1.46,0x000000,.30).setDepth(6);
@@ -141,11 +154,12 @@
   };
 
   GameScene.prototype.m3FaceTarget=function(x){
-    if(!this.playerImage||!this.player)return;
+    if(!this.player)return;
     const dir=x<this.player.x?-1:1;
-    this.playerImage.setFlipX(dir<0);
-    if(this.m3RearHead)this.m3RearHead.x=dir<0?2:-2;
+    if(this.playerImage)this.playerImage.setFlipX(dir<0);
+    if(this.m3RearHead){this.m3RearHead.x=dir<0?targetSafe(-4):targetSafe(4);this.m3RearHead.setScale(dir<0?-1:1,1);}
     if(this.m3Bat)this.m3Bat.x=Math.abs(this.m3Bat.x)*dir;
+    function targetSafe(v){return v}
   };
 
   GameScene.prototype.m3SwingBat=function(target,hit){
@@ -248,6 +262,7 @@
     if(this.m3Bg){for(const o of this.m3Bg)try{o?.destroy()}catch{}this.m3Bg=[];}
     try{this.m3Bat?.destroy()}catch{}this.m3Bat=null;
     try{this.m3RearHead?.destroy()}catch{}this.m3RearHead=null;
+    try{this.playerImage?.clearCrop()}catch{}
     return oldCleanup?.apply(this,args);
   };
 })();
